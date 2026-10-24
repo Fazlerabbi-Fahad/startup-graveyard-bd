@@ -1,0 +1,30 @@
+{
+  "name": "bdgy-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Public reading site: an archive of failed Bangladeshi startups as business case studies",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@next/third-parties": "^15.5.27",
+    "gsap": "^3.15.0",
+    "next": "^15.5.27",
+    "next-themes": "^0.4.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "postcss": "^8.5.29",
+    "tailwindcss": "^4.3.3"
+  }
+}
