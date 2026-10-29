@@ -99,6 +99,11 @@ export default function AboutPage() {
             >
               Browse the case studies
             </Link>
+            <p className="mt-6">
+              <Link href="/contact?topic=suggestion" className="link">
+                Suggest a startup or send a message
+              </Link>
+            </p>
           </section>
 
           <Undertakers compact />

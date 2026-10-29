@@ -27,8 +27,13 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/about#contribute" className="inline-flex min-h-11 items-center hover:text-accent">
+              <Link href="/contact?topic=suggestion" className="inline-flex min-h-11 items-center hover:text-accent">
                 Suggest a startup
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="inline-flex min-h-11 items-center hover:text-accent">
+                Contact
               </Link>
             </li>
           </ul>
