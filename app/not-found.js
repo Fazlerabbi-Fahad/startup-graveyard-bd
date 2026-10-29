@@ -21,7 +21,7 @@ export default function NotFound() {
           </Link>
         </li>
         <li>
-          <Link href="/case-studies" className="inline-flex min-h-12 items-center rounded-full bg-surface px-6 font-display font-semibold hover:bg-ink hover:text-paper">
+          <Link href="/case-studies" className="inline-flex min-h-12 items-center rounded-full bg-surface px-6 font-display font-semibold text-ink hover:bg-ink hover:text-paper">
             All case studies
           </Link>
         </li>

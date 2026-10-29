@@ -119,16 +119,16 @@ export function Timeline({ items = [] }) {
 
 export function ReasonCards({ reasons = [] }) {
   return (
-    <ul className="mb-10 grid gap-3">
+    <ul className="mb-10 grid grid-cols-[minmax(0,1fr)] gap-3">
       {reasons.map((r, i) => (
-        <li key={`${r.category}-${i}`} className="rounded-2xl bg-surface p-5 sm:p-6">
+        <li key={`${r.category}-${i}`} className="min-w-0 rounded-2xl bg-surface p-5 sm:p-6">
           <p className="flex items-center gap-2.5 font-display text-lg font-bold tracking-tight">
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-paper text-accent">
               <ReasonIcon category={r.category} className="size-[1.1rem]" />
             </span>
             {r.category}
           </p>
-          {r.summary && <p className="mt-3 font-serif text-[1.075rem] leading-relaxed">{r.summary}</p>}
+          {r.summary && <p className="mt-3 font-serif text-[1.075rem] leading-relaxed break-words">{r.summary}</p>}
         </li>
       ))}
     </ul>
