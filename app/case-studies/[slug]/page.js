@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
-import { getAllPublishedSafe, getCaseStudy, publicApiUrl } from '@/lib/api';
+import Link from 'next/link';
+import { getAllPublishedSafe, getCaseStudy, listCaseStudies, publicApiUrl } from '@/lib/api';
 import { excerpt, formatDate, isoDate, plural } from '@/lib/format';
 import { SITE_NAME, absoluteUrl } from '@/lib/site';
+import { buildFaq, caseStudyTitle, pickRelated, quickAnswer, shortName } from '@/lib/seo';
 import { JsonLd } from '@/components/JsonLd';
 import { RemoteImage, Logo } from '@/components/RemoteImage';
 import { Markdown } from '@/components/reading/Markdown';
@@ -11,6 +13,7 @@ import { AtAGlance, Competitors, Lessons, ReasonCards, ReasonTags, Section, Sour
 import { CorrectionForm } from '@/components/reading/CorrectionForm';
 import { ShareButtons } from '@/components/reading/ShareButtons';
 import { PrevNext } from '@/components/reading/PrevNext';
+import { Related } from '@/components/reading/Related';
 import { ViewPing } from '@/components/reading/ViewPing';
 import { Undertakers } from '@/components/Undertakers';
 
@@ -27,13 +30,14 @@ export async function generateMetadata({ params }) {
   const cs = await getCaseStudy(slug);
   if (!cs) return { title: 'Case study not found', robots: { index: false } };
   const description = cs.tagline || excerpt(cs.sections?.executiveSummary) || `How ${cs.name} failed, and what founders can learn from it.`;
-  const title = `${cs.name}: why it failed`;
+  const title = caseStudyTitle(cs);
   return {
     title,
     description,
     alternates: { canonical: `/case-studies/${cs.slug}` },
     openGraph: {
       type: 'article',
+      siteName: SITE_NAME,
       title,
       description,
       url: `/case-studies/${cs.slug}`,
@@ -58,6 +62,7 @@ function buildSections(cs) {
     has(s.whatCouldHaveBeenDone) && { id: 'what-could-have-been-done', label: 'What Could Have Been Done Differently' },
     cs.lessons?.length && { id: 'lessons', label: 'Lessons for Founders' },
     has(s.conclusion) && { id: 'conclusion', label: 'Conclusion' },
+    buildFaq(cs).length > 0 && { id: 'faq', label: 'FAQ' },
     (has(s.researchNotes) || cs.sources?.length) && { id: 'sources', label: 'Research Notes & Sources' },
     cs.competitors?.length && { id: 'competitors', label: 'Competitors' },
   ];
@@ -74,8 +79,19 @@ export default async function CaseStudyPage({ params }) {
     cs.nextSlug ? getCaseStudy(cs.nextSlug) : null,
   ]);
 
+  // Internal links: same sector first, then shared causes and era. Failures here must never break the page.
+  const [sameSector, latest] = await Promise.all([
+    cs.atAGlance?.sector ? listCaseStudies({ sector: cs.atAGlance.sector, limit: 12 }).catch(() => null) : null,
+    listCaseStudies({ limit: 12 }).catch(() => null),
+  ]);
+  const pool = [...new Map([...(sameSector?.items ?? []), ...(latest?.items ?? [])].map((c) => [c.slug, c])).values()];
+  const related = pickRelated(cs, pool);
+
   const g = cs.atAGlance ?? {};
   const s = cs.sections ?? {};
+  const name = shortName(cs.name);
+  const faq = buildFaq(cs);
+  const answer = quickAnswer(cs);
   const sections = buildSections(cs);
   const n = (id) => sections.findIndex((x) => x.id === id) + 1;
   const url = absoluteUrl(`/case-studies/${cs.slug}`);
@@ -87,8 +103,10 @@ export default async function CaseStudyPage({ params }) {
         data={{
           '@context': 'https://schema.org',
           '@type': 'Article',
-          headline: `${cs.name}: why it failed`,
+          headline: caseStudyTitle(cs),
           description: cs.tagline || excerpt(s.executiveSummary),
+          inLanguage: 'en',
+          citation: (cs.sources ?? []).filter((src) => src.url).map((src) => ({ '@type': 'CreativeWork', name: src.title, url: src.url })),
           datePublished: isoDate(cs.publishedAt),
           dateModified: isoDate(cs.updatedAt),
           author: { '@type': 'Organization', name: SITE_NAME, url: absoluteUrl('/') },
@@ -99,12 +117,43 @@ export default async function CaseStudyPage({ params }) {
           articleSection: g.sector ?? undefined,
         }}
       />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: absoluteUrl('/') },
+            { '@type': 'ListItem', position: 2, name: 'Case studies', item: absoluteUrl('/case-studies') },
+            { '@type': 'ListItem', position: 3, name, item: url },
+          ],
+        }}
+      />
+      {faq.length > 0 && (
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+          }}
+        />
+      )}
       <ProgressBar targetId="article" />
       <ViewPing apiUrl={publicApiUrl()} slug={cs.slug} />
 
       <article id="article">
         {/* Header */}
         <header className="mx-auto max-w-7xl px-5 pt-14 pb-12 sm:px-8 sm:pt-20">
+          <nav aria-label="Breadcrumb" className="label mb-6">
+            <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <li>
+                <Link href="/case-studies" className="hover:text-accent">
+                  Case studies
+                </Link>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li aria-current="page">{name}</li>
+            </ol>
+          </nav>
           <div className="flex flex-wrap items-center gap-3">
             <Logo src={cs.logoUrl} name={cs.name} size={48} tone="bg-surface" />
             <p className="label">{[g.sector, g.city].filter(Boolean).join(' · ') || 'Case study'}</p>
@@ -148,6 +197,7 @@ export default async function CaseStudyPage({ params }) {
             <TocMobile sections={sections} />
 
             <div className="max-w-[68ch] space-y-8">
+              {answer && <p className="font-serif text-[1.25rem] leading-relaxed text-pretty">{answer}</p>}
               <AtAGlance g={g} />
               <ReasonTags reasons={cs.failureReasons} />
             </div>
@@ -174,7 +224,7 @@ export default async function CaseStudyPage({ params }) {
                 </Section>
               )}
               {n('what-went-wrong') > 0 && (
-                <Section id="what-went-wrong" index={n('what-went-wrong')} title="What Went Wrong">
+                <Section id="what-went-wrong" index={n('what-went-wrong')} title={`Why did ${name} fail?`}>
                   {cs.failureReasons?.length > 0 && <ReasonCards reasons={cs.failureReasons} />}
                   <Markdown>{s.whatWentWrong}</Markdown>
                 </Section>
@@ -192,6 +242,18 @@ export default async function CaseStudyPage({ params }) {
               {n('conclusion') > 0 && (
                 <Section id="conclusion" index={n('conclusion')} title="Conclusion">
                   <Markdown>{s.conclusion}</Markdown>
+                </Section>
+              )}
+              {n('faq') > 0 && (
+                <Section id="faq" index={n('faq')} title="Frequently asked questions">
+                  <dl className="space-y-6">
+                    {faq.map((f) => (
+                      <div key={f.q}>
+                        <dt className="font-display text-lg font-bold tracking-tight">{f.q}</dt>
+                        <dd className="mt-2 font-serif text-[1.075rem] leading-relaxed break-words">{f.a}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </Section>
               )}
               {n('sources') > 0 && (
@@ -217,6 +279,7 @@ export default async function CaseStudyPage({ params }) {
         </div>
       </article>
 
+      <Related items={related} />
       <PrevNext prev={prev} next={next} />
     </>
   );

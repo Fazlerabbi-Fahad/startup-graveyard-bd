@@ -12,6 +12,7 @@ export default async function sitemap() {
     { url: absoluteUrl('/'), lastModified, changeFrequency: 'weekly', priority: 1 },
     { url: absoluteUrl('/case-studies'), lastModified, changeFrequency: 'weekly', priority: 0.9 },
     { url: absoluteUrl('/about'), changeFrequency: 'yearly', priority: 0.4 },
+    { url: absoluteUrl('/contact'), changeFrequency: 'yearly', priority: 0.3 },
     ...all.map((cs) => ({
       url: absoluteUrl(`/case-studies/${cs.slug}`),
       lastModified: cs.updatedAt ? new Date(cs.updatedAt) : undefined,

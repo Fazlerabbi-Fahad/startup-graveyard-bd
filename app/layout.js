@@ -19,8 +19,8 @@ export const metadata = {
   title: { default: `${SITE_NAME}: failed Bangladeshi startups as case studies`, template: `%s · ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  alternates: { canonical: '/' },
-  openGraph: { type: 'website', siteName: SITE_NAME, locale: 'en_US', url: '/' },
+  // No site-wide canonical or OG url here: each page sets its own, so a page that forgets can't inherit "/".
+  openGraph: { type: 'website', siteName: SITE_NAME, locale: 'en_US' },
   twitter: { card: 'summary_large_image' },
   robots: { index: true, follow: true },
 };

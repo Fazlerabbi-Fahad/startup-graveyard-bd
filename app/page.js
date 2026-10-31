@@ -31,6 +31,15 @@ export default async function Home() {
       <JsonLd
         data={{
           '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: SITE_NAME,
+          url: absoluteUrl('/'),
+          description: SITE_DESCRIPTION,
+        }}
+      />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
           '@type': 'WebSite',
           name: SITE_NAME,
           description: SITE_DESCRIPTION,
