@@ -38,6 +38,7 @@ export default function RootLayout({ children }) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   return (
     <html lang="en" className={fontVars} suppressHydrationWarning>
+      <meta name="google-site-verification" content="ibwLX6SJ_3qS3nymAwZvCwOQY8LdoDn4QB1_Wv6_YFg" />
       <body className="flex min-h-screen flex-col">
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
           <a
