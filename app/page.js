@@ -16,7 +16,7 @@ export const metadata = {
   title: { absolute: `${SITE_NAME}: failed Bangladeshi startups as case studies` },
   description: SITE_DESCRIPTION,
   alternates: { canonical: '/' },
-  openGraph: { title: SITE_NAME, description: SITE_TAGLINE, url: '/' },
+  openGraph: { type: 'website', siteName: SITE_NAME, title: SITE_NAME, description: SITE_TAGLINE, url: '/' },
   twitter: { title: SITE_NAME, description: SITE_TAGLINE },
 };
 
@@ -42,6 +42,7 @@ export default async function Home() {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
           name: SITE_NAME,
+          alternateName: [`${SITE_NAME} Bangladesh`],
           description: SITE_DESCRIPTION,
           url: absoluteUrl('/'),
           potentialAction: {
