@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getStats, getTaxonomies, listCaseStudies } from '@/lib/api';
 import { reasonHref, sectorHref } from '@/lib/format';
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, absoluteUrl } from '@/lib/site';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_NAME_FULL, SITE_TAGLINE, absoluteUrl } from '@/lib/site';
 import { CaseStudyCard } from '@/components/CaseStudyCard';
 import { CountUp } from '@/components/CountUp';
 import { SearchBox } from '@/components/SearchBox';
@@ -13,11 +13,11 @@ import { Undertakers } from '@/components/Undertakers';
 export const revalidate = 3600;
 
 export const metadata = {
-  title: { absolute: `${SITE_NAME}: failed Bangladeshi startups as case studies` },
+  title: { absolute: `${SITE_NAME_FULL}: failed startups as case studies` },
   description: SITE_DESCRIPTION,
   alternates: { canonical: '/' },
-  openGraph: { type: 'website', siteName: SITE_NAME, title: SITE_NAME, description: SITE_TAGLINE, url: '/' },
-  twitter: { title: SITE_NAME, description: SITE_TAGLINE },
+  openGraph: { type: 'website', siteName: SITE_NAME_FULL, title: SITE_NAME_FULL, description: SITE_DESCRIPTION, url: '/' },
+  twitter: { title: SITE_NAME_FULL, description: SITE_DESCRIPTION },
 };
 
 export default async function Home() {
@@ -32,8 +32,10 @@ export default async function Home() {
         data={{
           '@context': 'https://schema.org',
           '@type': 'Organization',
-          name: SITE_NAME,
+          name: SITE_NAME_FULL,
+          alternateName: SITE_NAME,
           url: absoluteUrl('/'),
+          logo: absoluteUrl('/icon.png'),
           description: SITE_DESCRIPTION,
         }}
       />
@@ -41,8 +43,8 @@ export default async function Home() {
         data={{
           '@context': 'https://schema.org',
           '@type': 'WebSite',
-          name: SITE_NAME,
-          alternateName: [`${SITE_NAME} Bangladesh`],
+          name: SITE_NAME_FULL,
+          alternateName: [SITE_NAME],
           description: SITE_DESCRIPTION,
           url: absoluteUrl('/'),
           potentialAction: {
@@ -58,7 +60,8 @@ export default async function Home() {
         <p className="label">An archive of failed Bangladeshi startups</p>
         <h1 className="h-display mt-6 max-w-[14ch] text-balance">{SITE_NAME}</h1>
         <p className="h-light mt-6 max-w-[22ch] text-[clamp(1.75rem,4vw,3rem)] leading-[1.1] text-balance">{SITE_TAGLINE}</p>
-        <div className="mt-12 flex max-w-2xl flex-col gap-5">
+        <p className="mt-8 max-w-[56ch] font-serif text-lg leading-relaxed text-muted">{SITE_DESCRIPTION}</p>
+        <div className="mt-10 flex max-w-2xl flex-col gap-5">
           <SearchBox id="hero-search" />
           <Link href="/case-studies" className="link inline-flex min-h-11 items-center gap-2 self-start font-display font-semibold">
             Browse all case studies
@@ -135,7 +138,8 @@ export default async function Home() {
       )}
 
       {/* Latest */}
-      <section aria-labelledby="latest-title" className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+      {/* data-nosnippet: keep individual case study text out of the home page's search snippet. */}
+      <section aria-labelledby="latest-title" data-nosnippet="" className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
           <h2 id="latest-title" className="font-display text-[clamp(2rem,4vw,3.25rem)] leading-none font-extrabold tracking-tight" data-reveal="">
             Latest case studies
